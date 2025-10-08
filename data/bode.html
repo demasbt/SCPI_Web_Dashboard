@@ -1,0 +1,119 @@
+<!DOCTYPE HTML><html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="/h.js"></script>
+  <style>
+    body {
+      min-width: 310px;
+    	max-width: 800px;
+    	height: 400px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>ESP REMOTE SCPI</h2>
+  <div id="chart-Bode" class="container"></div>
+</body>
+<script>
+const series = [{
+    name: 'CH1',
+    id: 'ch1',
+    marker: {
+        symbol: 'circle'
+    }
+},
+{
+    name: 'CH2',
+    id: 'ch2',
+    marker: {
+        symbol: 'circle'
+    }
+},
+{
+    name: 'Phase',
+    id: 'phase',
+    marker: {
+        symbol: 'circle'
+    }
+}];
+
+var chartT = new Highcharts.Chart({
+  chart:{ 
+    renderTo : 'chart-Bode',
+    type: 'scatter',
+    zooming: {
+        type: 'xy' }},
+  title: { text: 'BODE PLOT' },
+  exporting: { enabled : true },
+  xAxis: { 
+    type: 'logarithmic',
+    title: { text: 'Frequency' }
+  },
+  yAxis: {
+    title: { text: 'Magnitude' }
+  },
+  credits: { enabled: false },
+  plotOptions: {
+    scatter: {
+      marker: {
+        radius: 2.5,
+        symbol: 'circle',
+        states: {
+          hover: {
+            enabled: true,
+            lineColor: 'rgb(100,100,100)'
+                    }
+                  }
+                },
+        states: {
+          hover: {
+            marker: {
+              enabled: false
+                      }
+                  }
+                },
+        jitter: {
+            x: 0.005
+                }
+            }
+    },
+  tooltip: {
+            pointFormat: 'Freq: {point.x} Hz <br/> Gain: {point.y}'
+    },
+  series
+});
+
+setInterval(function() {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var myObj = JSON.parse(this.responseText);
+        plotBode(myObj);
+    }
+  };
+  xhr.open("GET", "/readSCPI", true);
+  xhr.send();
+}, 2000);
+
+function plotBode(jsonValue) {
+    var keys = Object.keys(jsonValue);
+    const key0 = keys[0];
+    const key1 = keys[1];
+    const key2 = keys[2];
+    const key3 = keys[3];
+    var x = Number(jsonValue[key0]);
+    var y1 = Number(jsonValue[key1]);
+    var y2 = Number(jsonValue[key2]);
+    var y3 = Number(jsonValue[key3]);
+
+    chartT.series[0].addPoint([x, y1], true, false, true);
+    chartT.series[1].addPoint([x, y2], true, false, true);
+}
+</script>
+</html>
