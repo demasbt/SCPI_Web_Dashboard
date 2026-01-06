@@ -39,26 +39,26 @@ JSONVar SCPIVal;
 // Function to read SCPI values and return as JSONVar
 String passjsonval(){
   JSONVar SCPIValue;
-  String receivedvpp, receivedfreq, jsonString;
-  float vppval, freqval;
+  String receivedvpp1, receivedvpp2, receivedph, receivedfreq, jsonString;
 
-  /*
   // Read SCPI values from Serial2
-  Serial2.write(":MEAS:SOUR 1;:MEAS:VPP?\n");
-  receivedvpp = Serial2.readStringUntil('\n');
-  vppval = atof(receivedvpp.c_str());
-  Serial2.write(":MEAS:SOUR 1;:MEAS:FREQ?\n");
-  receivedfreq = Serial2.readStringUntil('\n');
-  freqval = atof(receivedfreq.c_str());
-  SCPIValue["magnitude"] = vppval;
-  SCPIValue["frequency"] = receivedfreq;
-  */
+  Serial2.write(":MEAS:SOUR1 CH1\n:MEAS:PK2P?\n");
+  receivedvpp1 = Serial2.readStringUntil('\n');
+  SCPIValue["magnitude1"] = atof(receivedvpp1.c_str());
 
-  // testing value
-  SCPIValue["frequency"] = random(0,1000);
-  SCPIValue["magnitude1"] = random(0,10);
-  SCPIValue["magnitude2"] = random(0,10);
-  SCPIValue["phase"] = random(-90,90);
+  Serial2.write(":MEASU:MEAS2:SOU2 CH2\n:MEASU:MEAS2:TYP PK2\n:MEASU:MEAS2:STATE ON\n:MEASU:MEAS2:VAL?\n");
+  receivedvpp2 = Serial2.readStringUntil('\n');
+  SCPIValue["magnitude2"] = atof(receivedvpp2.c_str());
+
+  Serial2.write(":MEAS:FREQ?\n");
+  receivedfreq = Serial2.readStringUntil('\n');
+  SCPIValue["frequency"] = atof(receivedfreq.c_str());
+
+  Serial2.write(":MEAS:SOUR1 CH1\n:MEAS:SOUR2 CH2\n:MEAS:PHA?\n");
+  receivedph = Serial2.readStringUntil('\n');
+  SCPIValue["phase"] = atof(receivedph.c_str());
+  
+  
   jsonString = JSON.stringify(SCPIValue);
   return jsonString;
 }
