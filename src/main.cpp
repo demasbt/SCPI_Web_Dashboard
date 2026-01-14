@@ -177,7 +177,13 @@ void setup(){
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/realtime.html", "text/html");
   });
+  
+  // Route for plotting page
+  server.on("/plot", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/bode.html", "text/html");
+  });
 
+  /*
   // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
   server.on("/get", HTTP_POST, [] (AsyncWebServerRequest *request) {
     String inputOption;
@@ -196,15 +202,16 @@ void setup(){
       inputSamplenum = 0;
       
     }
-    /*request->send(200, "text/html", "HTTP POST request sent to your ESP on input field (" 
-                                     + inputOption + ") with value: " + inputSamplenum +
-                                     "<br><a href=\"/\">Return to Home Page</a>");*/
+    //request->send(200, "text/html", "HTTP POST request sent to your ESP on input field (" 
+    //                                 + inputOption + ") with value: " + inputSamplenum +
+    //                                 "<br><a href=\"/\">Return to Home Page</a>");
     
     request->send(LittleFS, "/bode.html", "text/html");
     Serial.println(inputOption);
     Serial.println(inputSamplenum);
-  });
+  });*/
 
+  // Route to static json values, changed if refreshed 
   server.on("/readSCPI", HTTP_ANY, [](AsyncWebServerRequest *request){
     String jsonString = passjsonval();
     request->send(200, "application/json", jsonString);
