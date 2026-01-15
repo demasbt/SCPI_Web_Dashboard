@@ -32,27 +32,6 @@ function onClose(event) {
 }
 
 
-const series = [{
-    name: 'CH1',
-    id: 'ch1',
-    marker: {
-        symbol: 'circle'
-    }
-},
-{
-    name: 'CH2',
-    id: 'ch2',
-    marker: {
-        symbol: 'circle'
-    }
-},
-{
-    name: 'Phase',
-    id: 'phase',
-    marker: {
-        symbol: 'circle'
-    }
-}];
 
 Highcharts.setOptions({
     plotOptions: {
@@ -95,13 +74,26 @@ var chart1 = new Highcharts.Chart({
     title: { text: 'Frequency' }
   },
   yAxis: {
-    title: { text: 'Magnitude' }
+    title: { text: 'Magnitude [dB]' }
   },
   credits: { enabled: false },
   tooltip: {
             pointFormat: 'Freq: {point.x} Hz <br/> Gain: {point.y}'
     },
-  series
+  series: [{
+    name: 'CH1',
+    id: 'ch1',
+    marker: {
+        symbol: 'circle'
+    }
+},
+{
+    name: 'CH2',
+    id: 'ch2',
+    marker: {
+        symbol: 'circle'
+    }
+}]
 });
 
 //Create the Phase chart
@@ -113,12 +105,15 @@ var chart2 = new Highcharts.Chart({
         type: 'xy' }},
   title: { text: 'PHASE' },
   exporting: { enabled : true },
+  dataGrouping:{
+    enabled: false
+  },
   xAxis: { 
     type: 'logarithmic',
     title: { text: 'Frequency' }
   },
   yAxis: {
-    title: { text: 'Phase' },
+    title: { text: 'Phase [&deg]' },
     max: 90,
     min: -90,
     tickInterval: 45,
@@ -126,9 +121,15 @@ var chart2 = new Highcharts.Chart({
   },
   credits: { enabled: false },
   tooltip: {
-            pointFormat: 'Freq: {point.x} Hz <br/> Phase: {point.y}'
+            pointFormat: 'Freq: {point.x} Hz <br/> Phase: {point.y} &deg'
     },
-  series
+  series: [{
+    name: 'Phase',
+    id: 'phase',
+    marker: {
+        symbol: 'circle'
+    }
+}]
 });
 
 // Function that receives the message from the ESP32 with the readings
@@ -163,5 +164,5 @@ function plotBode(jsonValue) {
 
     chart1.series[0].addPoint([x, db1], true, false, true);
     chart1.series[1].addPoint([x, db2], true, false, true);
-    chart2.series[2].addPoint([x, y3], true, false, true);
+    chart2.series[0].addPoint([x, y3], true, false, true);
 }

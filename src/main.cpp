@@ -74,15 +74,9 @@ void notifyClients(String sensorReadings) {
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-    //data[len] = 0;
-    //String message = (char*)data;
-    // Check if the message is "getReadings"
-    //if (strcmp((char*)data, "getReadings") == 0) {
-      //if it is, send current sensor readings
       String sensorReadings = passjsonval();
       Serial.print(sensorReadings);
       notifyClients(sensorReadings);
-    //}
   }
 }
 
@@ -162,17 +156,6 @@ void setup(){
   initLittleFS();
   initWebSocket();
 
-  // Route for highcharts.js library
-  server.on("/h.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/highcharts.js", "text/javascript");
-  });/*
-  server.on("/d.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/dataexport.js", "text/javascript");
-  });
-  server.on("/i.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/imgexport.js", "text/javascript");
-  });*/
-
   // Route for root / web page1
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/realtime.html", "text/html");
@@ -181,40 +164,6 @@ void setup(){
   // Route for plotting page
   server.on("/plot", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/bode.html", "text/html");
-  });
-
-  /*
-  // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
-  server.on("/get", HTTP_POST, [] (AsyncWebServerRequest *request) {
-    String inputOption;
-    String inputParam;
-    int inputSamplenum;
-    String inputParam2;
-    // GET input2 value on <ESP_IP>/get?input2=<inputMessage>
-    if (request->hasParam(PARAM_INPUT_1, true)) {
-      inputSamplenum = request->getParam(PARAM_INPUT_1, true)->value().toInt();
-      inputParam = PARAM_INPUT_1;
-      inputOption = request->getParam(PARAM_INPUT_2, true)->value();
-      inputParam2 = PARAM_INPUT_2;
-    }
-    else {
-      inputOption = "none";
-      inputSamplenum = 0;
-      
-    }
-    //request->send(200, "text/html", "HTTP POST request sent to your ESP on input field (" 
-    //                                 + inputOption + ") with value: " + inputSamplenum +
-    //                                 "<br><a href=\"/\">Return to Home Page</a>");
-    
-    request->send(LittleFS, "/bode.html", "text/html");
-    Serial.println(inputOption);
-    Serial.println(inputSamplenum);
-  });*/
-
-  // Route to static json values, changed if refreshed 
-  server.on("/readSCPI", HTTP_ANY, [](AsyncWebServerRequest *request){
-    String jsonString = passjsonval();
-    request->send(200, "application/json", jsonString);
   });
 
   server.serveStatic("/", LittleFS, "/");
