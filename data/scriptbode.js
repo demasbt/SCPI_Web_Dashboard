@@ -61,6 +61,42 @@ Highcharts.setOptions({
 });
 
 // Create the Magnitude chart
+var chart0 = new Highcharts.Chart({
+  chart:{ 
+    renderTo : 'chart-magnitude-vpp',
+    type: 'scatter',
+    zooming: {
+        type: 'xy' }},
+  title: { text: 'AMPLITUDE' },
+  exporting: { enabled : true },
+  xAxis: { 
+    type: 'logarithmic',
+    title: { text: 'Frequency' }
+  },
+  yAxis: {
+    title: { text: 'Amplitude (VPP)' }
+  },
+  credits: { enabled: false },
+  tooltip: {
+            pointFormat: 'Freq: {point.x} Hz <br/> Voltage: {point.y}VPP'
+    },
+  series: [{
+    name: 'CH1',
+    id: 'ch1',
+    marker: {
+        symbol: 'circle'
+    }
+},
+{
+    name: 'CH2',
+    id: 'ch2',
+    marker: {
+        symbol: 'circle'
+    }
+}]
+});
+
+// Create the Magnitude chart
 var chart1 = new Highcharts.Chart({
   chart:{ 
     renderTo : 'chart-magnitude',
@@ -78,18 +114,12 @@ var chart1 = new Highcharts.Chart({
   },
   credits: { enabled: false },
   tooltip: {
-            pointFormat: 'Freq: {point.x} Hz <br/> Gain: {point.y}'
+            pointFormat: 'Freq: {point.x} Hz <br/> Gain: {point.y} dB'
     },
   series: [{
-    name: 'CH1',
-    id: 'ch1',
-    marker: {
-        symbol: 'circle'
-    }
-},
-{
-    name: 'CH2',
-    id: 'ch2',
+    name: 'Output Gain',
+    id: 'gain',
+    color: 'rgb(204, 91, 214)',
     marker: {
         symbol: 'circle'
     }
@@ -126,6 +156,7 @@ var chart2 = new Highcharts.Chart({
   series: [{
     name: 'Phase',
     id: 'phase',
+    color: 'rgb(47, 226, 116)',
     marker: {
         symbol: 'circle'
     }
@@ -148,21 +179,17 @@ function onMessage(event) {
 // Create calculation to plot Bode diagram
 function plotBode(jsonValue) {
     var keys = Object.keys(jsonValue);
-    const key0 = keys[0];
-    const key1 = keys[1];
-    const key2 = keys[2];
-    const key3 = keys[3];
-    var y1 = Number(jsonValue[key0]);
-    var y2 = Number(jsonValue[key1]);
-    var x = Number(jsonValue[key2]);
-    var y3 = Number(jsonValue[key3]);
+    var y1 = Number(jsonValue[keys[0]]);
+    var y2 = Number(jsonValue[keys[1]]);
+    var x = Number(jsonValue[keys[2]]);
+    var y3 = Number(jsonValue[keys[3]]);
     if (x === 0 || y1 === 0 || y2 === 0 || y3 === 0) {
         return;
     }
-    var db1 = 20 * Math.log10(y1/y1);
-    var db2 = 20 * Math.log10(y2/y1);
+    var db1 = 20 * Math.log10(y2/y1);
 
+    chart0.series[0].addPoint([x, y1], true, false, true);
+    chart0.series[1].addPoint([x, y2], true, false, true);
     chart1.series[0].addPoint([x, db1], true, false, true);
-    chart1.series[1].addPoint([x, db2], true, false, true);
     chart2.series[0].addPoint([x, y3], true, false, true);
 }

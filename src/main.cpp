@@ -157,12 +157,12 @@ void setup(){
   initWebSocket();
 
   // Route for root / web page1
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/realtime.html", "text/html");
   });
   
   // Route for plotting page
-  server.on("/plot", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/bode.html", "text/html");
   });
 
