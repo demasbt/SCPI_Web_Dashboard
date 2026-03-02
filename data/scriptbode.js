@@ -1,6 +1,7 @@
 
 var gateway = `ws://${window.location.hostname}/ws`;
 var websocket;
+var datacount = 0;
 // Init web socket when the page loads
 window.addEventListener('load', onload);
 
@@ -144,8 +145,8 @@ var chart2 = new Highcharts.Chart({
   },
   yAxis: {
     title: { text: 'Phase [&deg]' },
-    max: 90,
-    min: -90,
+    max: 180,
+    min: -180,
     tickInterval: 45,
     minorTickInterval: 15
   },
@@ -165,31 +166,33 @@ var chart2 = new Highcharts.Chart({
 
 // Function that receives the message from the ESP32 with the readings
 function onMessage(event) {
-    console.log(event.data);
-    var myObj = JSON.parse(event.data);
-    var keys = Object.keys(myObj);
-    plotBode(myObj);
-
-    for (var i = 0; i < keys.length; i++){
-        var key = keys[i];
-        document.getElementById(key).innerHTML = myObj[key];
-    }
+  
+  //console.log(event.data);
+  var myObj = JSON.parse(event.data);
+  var keys = Object.keys(myObj);
+  plotBode(myObj);
+  for (var i = 0; i < keys.length; i++){
+      var key = keys[i];
+      document.getElementById(key).innerHTML = myObj[key];
+  }
 }
 
 // Create calculation to plot Bode diagram
 function plotBode(jsonValue) {
-    var keys = Object.keys(jsonValue);
-    var y1 = Number(jsonValue[keys[0]]);
-    var y2 = Number(jsonValue[keys[1]]);
-    var x = Number(jsonValue[keys[2]]);
-    var y3 = Number(jsonValue[keys[3]]);
-    if (x === 0 || y1 === 0 || y2 === 0 || y3 === 0) {
-        return;
-    }
-    var db1 = 20 * Math.log10(y2/y1);
+  var keys = Object.keys(jsonValue);
+  var y1 = Number(jsonValue[keys[0]]);
+  var y2 = Number(jsonValue[keys[1]]);
+  var x = Number(jsonValue[keys[2]]);
+  var y3 = Number(jsonValue[keys[3]]);
+  if (x === 0 || y1 === 0 || y2 === 0 || y3 > 180 || y3 < -180 || y3 === 0) {
+      return;
+  }
+  var db1 = 20 * Math.log10(y2/y1);
 
-    chart0.series[0].addPoint([x, y1], true, false, true);
-    chart0.series[1].addPoint([x, y2], true, false, true);
-    chart1.series[0].addPoint([x, db1], true, false, true);
-    chart2.series[0].addPoint([x, y3], true, false, true);
+  chart0.series[0].addPoint([x, y1], true, false, true);
+  chart0.series[1].addPoint([x, y2], true, false, true);
+  chart1.series[0].addPoint([x, db1], true, false, true);
+  chart2.series[0].addPoint([x, y3], true, false, true);
+  datacount++;
+  document.getElementById("datacount").innerHTML = datacount;
 }

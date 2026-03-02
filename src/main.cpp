@@ -176,7 +176,7 @@ void loop() {
   int connectedClients = WiFi.softAPgetStationNum();
   IPAddress IP = WiFi.softAPIP();
   oled_text(IP, connectedClients);
-  delay(500);
+  delay(100);
 
   if ((millis() - lastTime) > timerDelay) {
     String sensorReadings = passjsonval();

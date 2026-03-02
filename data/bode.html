@@ -17,13 +17,74 @@
       font-size: 2.5rem;
       text-align: center;
     }
-  </style>
+    .timedata-container {
+    padding: 50px;
+    font-family: Arial, Helvetica, sans-serif;
+    display: inline-block;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.card {
+    background-color: white;
+    box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+}
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #034078
+}
+.reading {
+    font-size: 1.2rem;
+    color: #1282A2;
+}
+</style>
 </head>
 <body>
   <h2>ESP REMOTE SCPI</h2>
   <div id="chart-magnitude-vpp" class="container"></div>
   <div id="chart-magnitude" class="container"></div>
   <div id="chart-phase" class="container"></div>
+  <div class="timedata-container">
+    <div class="card">
+      <p class="card-title">SESSION</p>
+      <p class="reading" id="timedata">00:00</p>
+    </div>
+    <div class="card">
+      <p class="card-title">DATA COUNT</p>
+      <p class="reading" id="datacount">0</p>
+    </div>
+  </div>
 </body>
 <script src="scriptbode.js"></script>
+<script>
+  // Initialize total seconds counter
+var totalSeconds = 0;
+
+// Update the count every 1 second
+setInterval(setTime, 1000);
+
+function setTime() {
+    ++totalSeconds;
+    // Calculate minutes and seconds
+    var minutes = pad(parseInt(totalSeconds / 60));
+    var seconds = pad(totalSeconds % 60);
+
+    // Update the display element
+    document.getElementById("timedata").innerHTML = minutes + ":" + seconds;
+}
+
+// Function to add a leading zero to single-digit numbers
+function pad(val) {
+    var valString = val + "";
+    if (valString.length < 2) {
+        return "0" + valString;
+    } else {
+        return valString;
+    }
+}
+</script>
 </html>
